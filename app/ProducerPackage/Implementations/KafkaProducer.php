@@ -4,11 +4,20 @@
 namespace App\ProducerPackage\Implementations;
 
 
-class KafkaProducer implements \App\ProducerPackage\ProducerInterface
+use App\ProducerPackage\ProducerInterface;
+use \RdKafka;
+
+class KafkaProducer implements ProducerInterface
 {
 
     public function produce($message)
     {
-        // TODO: Implement produce() method.
+        $conf = new RdKafka\Conf();
+        $rk = new RdKafka\Producer($conf);
+        $rk->addBrokers("localhost:9092");
+        $topic = $rk->newTopic("test");
+        $topic->produce(RD_KAFKA_PARTITION_UA, 0, json_encode($message, JSON_PRETTY_PRINT));
+        $rk->flush(10000);
+
     }
 }
